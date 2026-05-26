@@ -1,0 +1,70 @@
+# Virtual Environments
+.venv/
+venv/
+env/
+ENV/
+
+# Environment Variables
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Build / Distribution
+build/
+dist/
+*.egg-info/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# VS Code
+.vscode/
+
+# PyCharm
+.idea/
+
+# Logs
+*.log
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Model Outputs
+runs/
+outputs/
+
+# Temporary Files
+temp/
+tmp/
+
+# Uploaded Files
+uploads/
+
+# Ultralytics
+*.pt.old
+
+# Local Databases
+*.db
+*.sqlite3
+
+# Cache
+.cache/
+
+# Generated Reports
+reports/generated/
+
+# Secrets
+secrets.json
+credentials.json
+service-account.json

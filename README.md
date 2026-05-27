@@ -73,63 +73,18 @@ The platform promotes **community-driven road transparency** by making every com
 
 ### 🤖 AI Analysis Pipeline
 
-```
-  [ Uploaded image ]
-         │
-    ▼ validate ─── not a road? → rejected
-         │
-    ▼ damage detection
-         │
-    ▼ severity scoring    → low / medium / high / critical
-         │
-    ▼ condition analysis
-         │
-    ▼ test score generated
-         │
-  [ result → backend ]
-```
+
 
 ---
 
-### 📋 Dashboard Logic
 
-```
-  New complaint submitted
-         │
-    ┌────▼─────────────────────┐
-    │  Duplicate check          │
-    │  match by location+roadID │
-    └────┬──────────┬───────────┘
-         │ unique   │ duplicate
-         ▼          ▼
-    new entry   supportCount++
-         │          │
-         └────┬─────┘
-              ▼
-    Dashboard — sorted by support votes
-              │
-    ┌─────────▼──────────────────┐
-    │  Pending → In Review        │
-    │           → Resolved        │
-    └────────────────────────────┘
 ```
 
 > **Duplicate detection:** matches complaints by GPS location + road ID. Duplicates don't create new entries — they boost the existing issue's community support count, keeping the dashboard clean and impact-ranked.
 
 ---
 
-## 🗄️ Database Structure
 
-### `roads` Collection
-Stores road metadata retrieved via Overpass API — road ID, name, type (NH/SH/MDR/Other), and geographic coordinates.
-
-### `complaints` Collection
-Stores citizen-submitted complaints with GPS location, uploaded image reference, AI analysis results (damage type, severity, testScore), road classification, support vote count, and current status.
-
-### `reports` Collection
-Stores generated complaint letters linked to their parent complaint — includes authority details, formatted report content, and generation timestamp.
-
----
 
 ## 📁 Folder Structure
 

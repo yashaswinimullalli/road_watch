@@ -332,9 +332,9 @@ Road Transparency & Accountability System`;
           }
         ]);
 
-        // Automatically redirect to the dashboard page after 2.5 seconds
+        // Automatically redirect to the detailed Review Report page of that complaint after 2.5 seconds
         setTimeout(() => {
-          navigate('/admin');
+          navigate(`/report/${result.data._id}`);
         }, 2500);
       } else {
         // Always show Report, and immediately follow with the formal complaint letter editor

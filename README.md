@@ -78,7 +78,6 @@ The platform promotes **community-driven road transparency** by making every com
 ---
 
 
-```
 
 > **Duplicate detection:** matches complaints by GPS location + road ID. Duplicates don't create new entries — they boost the existing issue's community support count, keeping the dashboard clean and impact-ranked.
 

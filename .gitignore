@@ -4,28 +4,71 @@ npm-debug.log*
 
 # Environment
 .env
-.env.local
-.env.production
+.env.*
+!.env.example
 
 # Uploads (don't commit real images)
 uploads/
 
-# Python
-__pycache__/
-*.py[cod]
-*.pyo
+# Virtual Environments
 .venv/
 venv/
 env/
-*.egg-info/
+ENV/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+
+# Build / Distribution
+build/
 dist/
-.pytest_cache/
+*.egg-info/
 
-# OS
-.DS_Store
-Thumbs.db
+# Jupyter
+.ipynb_checkpoints/
 
-# IDE
+# IDE / Editor
 .vscode/
 .idea/
 *.swp
+
+# Logs
+*.log
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Model Outputs
+runs/
+outputs/
+
+# Temporary Files
+temp/
+tmp/
+
+# Ultralytics
+*.pt.old
+
+# Local Databases
+*.db
+*.sqlite3
+
+# Cache
+.cache/
+
+# Generated Reports
+reports/generated/
+
+# Secrets
+secrets.json
+credentials.json
+service-account.json

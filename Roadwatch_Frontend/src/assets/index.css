@@ -1,0 +1,69 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Merriweather:wght@300;400;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-slate-50 text-slate-800 font-sans antialiased selection:bg-brand-500 selection:text-white transition-colors duration-300;
+  }
+  
+  .dark body {
+    @apply bg-slate-900 text-slate-200;
+  }
+}
+
+@layer components {
+  .glass-panel {
+    @apply bg-white border border-slate-200 rounded-2xl shadow-xl transition-all duration-300;
+  }
+  
+  .dark .glass-panel {
+    @apply bg-slate-800/80 backdrop-blur-lg border-slate-700 shadow-2xl;
+  }
+  
+  .btn-primary {
+    @apply px-6 py-3 bg-brand-500 hover:bg-brand-600 text-white font-medium rounded-xl transition-all duration-300 shadow-lg active:scale-95;
+  }
+  
+  .dark .btn-primary {
+    @apply shadow-brand-500/20;
+  }
+  
+  .btn-secondary {
+    @apply px-6 py-3 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 font-medium rounded-xl transition-all duration-300 shadow-sm active:scale-95;
+  }
+  
+  .dark .btn-secondary {
+    @apply bg-slate-800 hover:bg-slate-700 text-slate-200 border-slate-700;
+  }
+  
+  .input-field {
+    @apply w-full px-4 py-3 bg-white border border-slate-300 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 transition-all;
+  }
+  
+  .dark .input-field {
+    @apply bg-slate-800 border-slate-700 text-slate-200 placeholder-slate-500;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-slate-300 rounded-full;
+}
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-slate-400;
+}
+.dark ::-webkit-scrollbar-thumb {
+  @apply bg-slate-700;
+}
+.dark ::-webkit-scrollbar-thumb:hover {
+  @apply bg-slate-600;
+}

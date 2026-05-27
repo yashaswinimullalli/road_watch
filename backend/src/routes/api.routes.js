@@ -1,8 +1,69 @@
 const express = require('express');
 const router = express.Router();
+const multer = require('multer');
 const processController = require('../controllers/process.controller');
 
-// Main POST route for the 9-step flow
-router.post('/analyze-road', processController.processAnalysis);
+// Multer — store image in memory so we can forward the buffer to the AI service
+const upload = multer({ storage: multer.memoryStorage() });
+
+// Main POST route — accepts multipart/form-data with an optional image file
+router.post('/analyze-road', upload.single('image'), processController.processAnalysis);
+
+// Route for storing readable location
+router.post('/location', async (req, res) => {
+  try {
+    const Location = require('../models/Location');
+    const { location, latitude, longitude } = req.body;
+    const newLocation = new Location({ location, latitude, longitude });
+    await newLocation.save();
+    res.status(200).json({ success: true, data: newLocation });
+  } catch (error) {
+    console.error("Error saving location:", error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Route for retrieving all submitted reports with mapped location and support counts
+router.get('/reports', async (req, res) => {
+  try {
+    const RoadDamage = require('../models/RoadDamage');
+    const Location = require('../models/Location');
+    
+    const damages = await RoadDamage.find().sort({ submittedDate: -1 }).lean();
+    const locationIds = damages.map(d => d.locationId).filter(Boolean);
+    const locations = await Location.find({ _id: { $in: locationIds } }).lean();
+    
+    const locationMap = {};
+    locations.forEach(loc => {
+      locationMap[loc._id.toString()] = loc;
+    });
+
+    const reports = damages.map(d => {
+      const loc = locationMap[d.locationId?.toString()] || {};
+      return {
+        id: `#RW-${d._id.toString().slice(-4).toUpperCase()}`,
+        _id: d._id,
+        issueType:    d.issueType    || d.roadDamage || 'Pothole',
+        roadDamage:   d.roadDamage   || d.issueType  || 'Pothole',
+        roadType:     d.roadType     || 'Other Road',
+        location: loc.location || (loc.latitude ? `${loc.latitude.toFixed(4)}, ${loc.longitude.toFixed(4)}` : 'Coordinates: Lat/Lng'),
+        latitude:     loc.latitude,
+        longitude:    loc.longitude,
+        status:       d.status       || 'Pending',
+        supportCount: d.supportCount || 1,
+        authority:    d.authority    || 'Local Municipal Corporations',
+        submittedDate: d.submittedDate || loc.timestamp || new Date(),
+        severity:     d.severity     || 'Unknown',
+        condition:    d.condition    || 'Unknown'
+      };
+    });
+
+    res.json({ success: true, data: reports });
+  } catch (error) {
+    console.error("Error fetching reports:", error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
 
 module.exports = router;
+

@@ -66,7 +66,8 @@ The platform promotes **community-driven road transparency** by making every com
 ## 🏗️ System Architecture
 
 ### 🌐 Full System Flow
-<img width="1312" height="1199" alt="full flow" src="https://github.com/user-attachments/assets/9a0431fa-8104-4a1a-8972-e706c7f7e571" />
+<img width="1024" height="1536" alt="image" src="https://github.com/user-attachments/assets/cb016eb0-3a04-4dd9-9153-a14c824de71d" />
+
 
 ---
 

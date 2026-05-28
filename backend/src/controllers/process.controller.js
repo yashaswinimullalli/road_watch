@@ -49,7 +49,7 @@ exports.processAnalysis = async (req, res) => {
 
     try {
       console.info(`📡 Querying Nominatim for road classification at coordinates: (${lat}, ${lng})...`);
-      const nominatimUrl = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`;
+      const nominatimUrl = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}&zoom=17`;
       const nominatimRes = await axios.get(nominatimUrl, {
         timeout: 4000,
         headers: { 'User-Agent': 'RoadWatch/1.0 (road-transparency-app)' }

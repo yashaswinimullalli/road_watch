@@ -7,19 +7,28 @@ const RoadDamage = require('../models/RoadDamage');
 const AI_SERVICE_BASE = process.env.AI_SERVICE_URL ? process.env.AI_SERVICE_URL.replace(/\/api\/v1\/analyze\/?$/, '') : 'http://localhost:8000';
 const AI_SERVICE_URL = `${AI_SERVICE_BASE}/api/v1/analyze`;
 
-// Maps Overpass highway tag → human-readable road type
+// Maps Overpass highway tag → human-readable road type (matching the 6-category database schema)
 const mapRoadType = (highwayTag) => {
   const tag = (highwayTag || '').toLowerCase().trim();
   if (tag.startsWith('motorway') || tag.startsWith('trunk')) {
-    return 'National Highway';
+    return 'National Highway (NH)';
   }
   if (tag.startsWith('primary')) {
-    return 'State Highway';
+    return 'State Highway (SH)';
   }
   if (tag.startsWith('secondary')) {
-    return 'Major District Road';
+    return 'Major District Road (MDR) / Urban Arterial Road';
   }
-  return 'Other Road'; // Fallback for tertiary, residential, service, unclassified, etc.
+  if (tag.startsWith('tertiary')) {
+    return 'Other District Road (ODR)';
+  }
+  if (tag.startsWith('residential') || tag.startsWith('service') || tag.startsWith('unclassified')) {
+    return 'Local Road';
+  }
+  if (tag.startsWith('track')) {
+    return 'Rural Access Road / Village Road';
+  }
+  return 'Local Road'; // Fallback matching the new database schema
 };
 
 // Maps Overpass/Nominatim highway tag → detailed human-readable road classification (additional layer)

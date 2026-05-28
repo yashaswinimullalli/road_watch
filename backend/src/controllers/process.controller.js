@@ -9,10 +9,17 @@ const AI_SERVICE_URL = `${AI_SERVICE_BASE}/api/v1/analyze`;
 
 // Maps Overpass highway tag → human-readable road type
 const mapRoadType = (highwayTag) => {
-  if (highwayTag === 'trunk')     return 'National Highway';
-  if (highwayTag === 'primary')   return 'State Highway';
-  if (highwayTag === 'secondary') return 'Major District Road';
-  return 'Other Road'; // Fallback for any unmapped road type
+  const tag = (highwayTag || '').toLowerCase().trim();
+  if (tag.startsWith('motorway') || tag.startsWith('trunk')) {
+    return 'National Highway';
+  }
+  if (tag.startsWith('primary')) {
+    return 'State Highway';
+  }
+  if (tag.startsWith('secondary')) {
+    return 'Major District Road';
+  }
+  return 'Other Road'; // Fallback for tertiary, residential, service, unclassified, etc.
 };
 
 // Formats a date value to YYYY-MM-DD string for the AI service
@@ -41,14 +48,16 @@ exports.processAnalysis = async (req, res) => {
     const overpassUrls = [
       `https://overpass-api.de/api/interpreter?data=[out:json];way(around:20,${lat},${lng})[highway];out tags;`,
       `https://lz4.overpass-api.de/api/interpreter?data=[out:json];way(around:20,${lat},${lng})[highway];out tags;`,
-      `https://z.overpass-api.de/api/interpreter?data=[out:json];way(around:20,${lat},${lng})[highway];out tags;`
+      `https://z.overpass-api.de/api/interpreter?data=[out:json];way(around:20,${lat},${lng})[highway];out tags;`,
+      `https://overpass.kumi.systems/api/interpreter?data=[out:json];way(around:20,${lat},${lng})[highway];out tags;`,
+      `https://overpass.nchc.org.tw/api/interpreter?data=[out:json];way(around:20,${lat},${lng})[highway];out tags;`
     ];
 
     let overpassData = null;
     for (const url of overpassUrls) {
       try {
         const overpassRes = await axios.get(url, {
-          timeout: 10000, // 10 seconds per attempt
+          timeout: 4000, // 4 seconds per attempt to failover quickly if a mirror is slow
           headers: { 'User-Agent': 'RoadWatch/1.0 (road-transparency-app)' }
         });
         if (overpassRes.data && overpassRes.data.elements) {
@@ -56,7 +65,7 @@ exports.processAnalysis = async (req, res) => {
           break; // Successfully got data, stop trying other mirrors
         }
       } catch (overpassErr) {
-        console.warn(`⚠️ Overpass API mirror failed (${url}):`, overpassErr.message);
+        console.info(`ℹ️ Overpass API mirror busy/failed, trying next...`);
       }
     }
 

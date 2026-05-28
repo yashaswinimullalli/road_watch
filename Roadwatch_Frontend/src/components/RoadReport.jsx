@@ -36,15 +36,15 @@ export default function RoadReport({ data }) {
     <div className="w-full space-y-3 animate-fade-in">
 
       {/* Header Banner */}
-      <div className="rounded-2xl bg-gradient-to-r from-brand-500 to-indigo-500 p-4 text-white shadow-lg">
+      <div className="rounded-2xl bg-gradient-to-r from-brand-500 to-indigo-500 p-3 md:p-4 text-white shadow-lg">
         <p className="text-xs font-semibold uppercase tracking-widest text-white/70 mb-1">Road Transparency Report</p>
-        <h3 className="text-lg font-bold leading-tight truncate">
+        <h3 className="text-base md:text-lg font-bold leading-tight break-words">
           {data.roadName && data.roadName !== 'Unnamed Road' ? data.roadName : data.roadType}
         </h3>
         {data.location && (
           <div className="flex items-start gap-1.5 mt-2">
             <MapPin className="w-3.5 h-3.5 shrink-0 mt-0.5 text-white/70" />
-            <p className="text-xs text-white/80 line-clamp-2 leading-snug">{data.location}</p>
+            <p className="text-xs text-white/80 line-clamp-2 leading-snug break-words">{data.location}</p>
           </div>
         )}
       </div>
@@ -82,20 +82,20 @@ export default function RoadReport({ data }) {
         </div>
 
         {/* Budget Row */}
-        <div className="flex flex-col sm:flex-row gap-2">
-          <div className="flex-1 px-4 py-3 rounded-xl bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50 shadow-sm">
-            <div className="flex items-center gap-2 mb-1">
-              <Wallet className="w-3.5 h-3.5 text-emerald-500" />
+        <div className="grid grid-cols-2 gap-2">
+          <div className="px-3 md:px-4 py-3 rounded-xl bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50 shadow-sm">
+            <div className="flex items-center gap-1.5 mb-1">
+              <Wallet className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
               <p className="text-xs text-slate-500 dark:text-slate-400">Allocated</p>
             </div>
-            <p className="text-sm font-bold text-emerald-600 dark:text-emerald-400">{data.budgetAllocated}</p>
+            <p className="text-sm font-bold text-emerald-600 dark:text-emerald-400 break-words">{data.budgetAllocated}</p>
           </div>
-          <div className="flex-1 px-4 py-3 rounded-xl bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50 shadow-sm">
-            <div className="flex items-center gap-2 mb-1">
-              <Wallet className="w-3.5 h-3.5 text-amber-500" />
+          <div className="px-3 md:px-4 py-3 rounded-xl bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50 shadow-sm">
+            <div className="flex items-center gap-1.5 mb-1">
+              <Wallet className="w-3.5 h-3.5 text-amber-500 shrink-0" />
               <p className="text-xs text-slate-500 dark:text-slate-400">Spent</p>
             </div>
-            <p className="text-sm font-bold text-amber-600 dark:text-amber-400">{data.amountSpent}</p>
+            <p className="text-sm font-bold text-amber-600 dark:text-amber-400 break-words">{data.amountSpent}</p>
           </div>
         </div>
 
@@ -127,19 +127,19 @@ export default function RoadReport({ data }) {
 
         <div className="flex gap-2 flex-wrap">
           {/* Issue Type */}
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-800 border border-slate-700">
-            <Wrench className="w-3.5 h-3.5 text-slate-400" />
+          <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-slate-800 border border-slate-700 min-w-0">
+            <Wrench className="w-3.5 h-3.5 text-slate-400 shrink-0" />
             <span className="text-xs text-slate-400">Issue</span>
-            <span className="text-xs font-bold text-white">{data.issueType || data.roadDamage || 'N/A'}</span>
+            <span className="text-xs font-bold text-white truncate max-w-[120px]">{data.issueType || data.roadDamage || 'N/A'}</span>
           </div>
 
           {/* Severity */}
-          <span className={`px-3 py-1.5 rounded-xl text-xs font-bold border border-transparent ${severityColor(data.severity)}`}>
+          <span className={`px-2.5 py-1.5 rounded-xl text-xs font-bold border border-transparent ${severityColor(data.severity)}`}>
             {data.severity || 'N/A'} Severity
           </span>
 
           {/* Condition */}
-          <span className={`px-3 py-1.5 rounded-xl text-xs font-bold border border-transparent ${conditionColor(data.condition)}`}>
+          <span className={`px-2.5 py-1.5 rounded-xl text-xs font-bold border border-transparent ${conditionColor(data.condition)}`}>
             {data.condition || data.roadDamage || 'N/A'} Condition
           </span>
         </div>

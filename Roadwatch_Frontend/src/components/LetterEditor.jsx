@@ -43,13 +43,14 @@ export default function LetterEditor({ initialContent, onSubmit }) {
         <span className="text-xs bg-brand-100 dark:bg-brand-500/20 text-brand-700 dark:text-brand-400 px-2 py-1 rounded font-medium">Editable A4 Format</span>
       </div>
       
-      <div className="p-4 md:p-6 bg-slate-100 dark:bg-slate-800/50 flex justify-center">
-        {/* A4 Paper Styling */}
-        <div className="bg-white dark:bg-slate-900 shadow-md border border-slate-200 dark:border-slate-700 p-6 md:p-8 w-full max-w-lg aspect-[1/1.414] font-serif text-slate-800 dark:text-slate-300">
+      <div className="p-3 md:p-6 bg-slate-100 dark:bg-slate-800/50 flex justify-center">
+        {/* A4 Paper Styling — full width on mobile, proportioned on larger screens */}
+        <div className="bg-white dark:bg-slate-900 shadow-md border border-slate-200 dark:border-slate-700 p-4 md:p-8 w-full font-serif text-slate-800 dark:text-slate-300">
           <textarea 
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            className="w-full h-full resize-none bg-transparent border-none focus:outline-none focus:ring-0 leading-relaxed text-sm"
+            className="w-full resize-none bg-transparent border-none focus:outline-none focus:ring-0 leading-relaxed text-xs sm:text-sm letter-content"
+            style={{ minHeight: '320px' }}
           />
         </div>
       </div>

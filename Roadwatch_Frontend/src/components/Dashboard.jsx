@@ -74,20 +74,20 @@ export default function Dashboard() {
     <div className="space-y-6">
 
       {/* ── Stats Grid ─────────────────────────────────────────────────────── */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-4">
         {stats.map((stat, i) => (
           <div
             key={i}
-            className="glass-panel p-5 flex flex-col justify-between min-h-[7.5rem] relative overflow-hidden group"
+            className="glass-panel p-4 md:p-5 flex flex-col justify-between min-h-[6.5rem] md:min-h-[7.5rem] relative overflow-hidden group"
           >
             {/* faded background icon */}
-            <div className="absolute top-0 right-0 p-4 opacity-10 dark:opacity-20 group-hover:opacity-20 dark:group-hover:opacity-40 group-hover:scale-110 transition-all duration-500">
+            <div className="absolute top-0 right-0 p-3 md:p-4 opacity-10 dark:opacity-20 group-hover:opacity-20 dark:group-hover:opacity-40 group-hover:scale-110 transition-all duration-500">
               {stat.icon}
             </div>
-            <span className="text-slate-500 dark:text-slate-400 text-sm font-medium leading-tight">
+            <span className="text-slate-500 dark:text-slate-400 text-xs sm:text-sm font-medium leading-tight pr-8">
               {stat.label}
             </span>
-            <span className={`text-3xl font-bold mt-2 ${stat.color}`}>
+            <span className={`text-2xl md:text-3xl font-bold mt-2 ${stat.color}`}>
               {stat.value}
             </span>
           </div>
@@ -96,16 +96,16 @@ export default function Dashboard() {
 
       {/* ── Recent Reports Table ────────────────────────────────────────────── */}
       <div className="glass-panel overflow-hidden">
-        <div className="p-5 md:p-6 border-b border-slate-200 dark:border-white/5 flex flex-wrap justify-between items-center gap-3">
+        <div className="p-4 md:p-6 border-b border-slate-200 dark:border-white/5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 md:gap-3">
           <div>
-            <h3 className="text-xl font-bold text-slate-900 dark:text-white">
+            <h3 className="text-lg md:text-xl font-bold text-slate-900 dark:text-white">
               Submitted Road Complaints
             </h3>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
               Live data from the road damage reports collection
             </p>
           </div>
-          <div className="flex items-center gap-2 px-3 py-1.5 bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/20 rounded-full">
+          <div className="flex items-center gap-2 px-3 py-1.5 bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/20 rounded-full shrink-0">
             <ThumbsUp className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
             <span className="text-xs font-semibold text-indigo-700 dark:text-indigo-300">
               {totalVotes} Total Community Votes
@@ -127,8 +127,8 @@ export default function Dashboard() {
             </p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse min-w-[640px]">
+          <div className="overflow-x-auto -webkit-overflow-scrolling-touch">
+            <table className="w-full text-left border-collapse" style={{ minWidth: '620px' }}>
               <thead>
                 <tr className="bg-slate-50 dark:bg-white/5 text-slate-500 dark:text-slate-400 text-xs font-semibold uppercase tracking-wider">
                   <th className="px-4 py-3">Location</th>

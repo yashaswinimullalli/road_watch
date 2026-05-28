@@ -20,35 +20,35 @@ function Navbar({ theme, toggleTheme }) {
   }, []);
 
   return (
-    <nav className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 ${scrolled ? 'bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg border-b border-slate-200 dark:border-slate-800 py-3 shadow-sm' : 'bg-transparent py-4 md:py-6'}`}>
+    <nav className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 ${scrolled ? 'bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg border-b border-slate-200 dark:border-slate-800 py-2 md:py-3 shadow-sm' : 'bg-transparent py-3 md:py-6'}`}>
       <div className="max-w-7xl mx-auto px-3 md:px-6 flex items-center justify-between gap-2">
-        <Link to="/" className="flex items-center gap-2 group shrink-0">
-          <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-brand-500 flex items-center justify-center text-white font-bold text-base md:text-xl shadow-lg transition-transform group-hover:scale-105">
+        <Link to="/" className="flex items-center gap-1.5 md:gap-2 group shrink-0 min-w-0">
+          <div className="w-8 h-8 md:w-10 md:h-10 shrink-0 rounded-xl bg-brand-500 flex items-center justify-center text-white font-bold text-base md:text-xl shadow-lg transition-transform group-hover:scale-105">
             R
           </div>
-          <span className="text-base md:text-xl font-bold tracking-tight text-slate-900 dark:text-white transition-colors">
+          <span className="text-sm sm:text-base md:text-xl font-bold tracking-tight text-slate-900 dark:text-white transition-colors truncate">
             RoadSathi
           </span>
         </Link>
         
-        <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-1.5 py-1.5 rounded-2xl shadow-sm">
+        <div className="flex items-center gap-1.5 md:gap-2 shrink-0">
+          <div className="flex items-center gap-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-1 md:px-1.5 py-1 md:py-1.5 rounded-2xl shadow-sm">
             <Link
               to="/"
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-medium transition-all ${
+              className={`flex items-center gap-1 md:gap-1.5 px-2 md:px-3 py-1.5 rounded-xl text-xs md:text-sm font-medium transition-all ${
                 location.pathname === '/' 
                   ? 'bg-brand-500/10 text-brand-500 dark:text-brand-400' 
                   : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700/50'
               }`}
             >
-              <HomeIcon className="w-4 h-4 md:w-5 md:h-5" />
-              <span className="hidden md:inline">Home</span>
+              <HomeIcon className="w-4 h-4 md:w-5 md:h-5 shrink-0" />
+              <span className="hidden sm:inline">Home</span>
             </Link>
           </div>
           
           <button 
             onClick={toggleTheme}
-            className="p-2.5 md:p-3 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:text-brand-500 dark:hover:text-brand-400 hover:shadow-md transition-all active:scale-95 shadow-sm"
+            className="p-2 md:p-2.5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:text-brand-500 dark:hover:text-brand-400 hover:shadow-md transition-all active:scale-95 shadow-sm"
             aria-label="Toggle Theme"
           >
             {theme === 'dark' ? <Sun className="w-4 h-4 md:w-5 md:h-5" /> : <Moon className="w-4 h-4 md:w-5 md:h-5" />}
@@ -117,7 +117,7 @@ function App() {
     <Router>
       <div className="min-h-screen flex flex-col transition-colors duration-300 bg-slate-50 dark:bg-slate-950">
         <Navbar theme={theme} toggleTheme={toggleTheme} />
-        <main className="flex-grow pt-16 md:pt-24 pb-4 md:pb-8 px-2 sm:px-4 md:px-6 relative flex flex-col min-h-0">
+        <main className="flex-grow pt-14 sm:pt-16 md:pt-24 pb-4 md:pb-8 px-2 sm:px-3 md:px-6 relative flex flex-col min-h-0 overflow-x-hidden">
           <Routes>
             <Route path="/" element={<Home coords={userCoords} />} />
             <Route path="/admin" element={<AdminDashboard />} />

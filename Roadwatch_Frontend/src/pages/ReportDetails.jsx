@@ -183,23 +183,23 @@ Road Transparency & Accountability System`;
       </button>
 
       {/* Main Title Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
-        <div>
-          <div className="flex items-center gap-3">
-            <span className="px-3 py-1 bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 text-xs font-semibold uppercase tracking-wider rounded-full border border-amber-200 dark:border-amber-500/20">
+      <div className="flex flex-col sm:flex-row justify-between items-start gap-3 md:gap-4 mb-6 md:mb-8">
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-center gap-2 md:gap-3">
+            <span className="px-3 py-1 bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 text-xs font-semibold uppercase tracking-wider rounded-full border border-amber-200 dark:border-amber-500/20 shrink-0">
               {report.id}
             </span>
             <span className="text-xs text-slate-400">
               Reported on {new Date(report.submittedDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
             </span>
           </div>
-          <h1 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white mt-2 flex items-start gap-2">
-            <MapPin className="w-6 h-6 text-brand-500 shrink-0 mt-1" />
-            {report.location}
+          <h1 className="text-xl md:text-3xl font-bold text-slate-900 dark:text-white mt-2 flex items-start gap-2">
+            <MapPin className="w-5 h-5 md:w-6 md:h-6 text-brand-500 shrink-0 mt-1" />
+            <span className="break-words min-w-0">{report.location}</span>
           </h1>
         </div>
 
-        <div className="flex items-center gap-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-4 py-2.5 rounded-2xl shadow-sm">
+        <div className="flex items-center gap-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-4 py-2.5 rounded-2xl shadow-sm shrink-0 self-start">
           <ThumbsUp className="w-5 h-5 text-indigo-500 shrink-0" />
           <div>
             <div className="text-xs text-slate-500">Community Support</div>
@@ -230,7 +230,7 @@ Road Transparency & Accountability System`;
             </button>
           </div>
 
-          <div className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-inner font-mono text-sm leading-relaxed overflow-x-auto text-slate-800 dark:text-slate-200 max-h-[600px] overflow-y-auto whitespace-pre-wrap">
+          <div className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 md:p-6 shadow-inner font-mono text-xs md:text-sm leading-relaxed overflow-x-auto text-slate-800 dark:text-slate-200 max-h-[500px] md:max-h-[600px] overflow-y-auto whitespace-pre-wrap break-words">
             {letterText}
           </div>
         </div>

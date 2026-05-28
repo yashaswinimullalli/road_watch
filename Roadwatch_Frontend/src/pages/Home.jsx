@@ -446,7 +446,7 @@ Road Transparency & Accountability System`;
   };
 
   return (
-    <div className="max-w-7xl mx-auto w-full flex-grow flex gap-3 md:gap-6 min-h-0" style={{ height: 'calc(100dvh - 80px)' }}>
+    <div className="max-w-7xl mx-auto w-full flex-grow flex gap-2 md:gap-6 min-h-0" style={{ height: 'calc(100dvh - 72px)' }}>
 
       {/* Left Sidebar - User History (Visible on large screens) */}
       <div className="hidden lg:flex w-72 flex-col bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-xl transition-colors duration-300 shrink-0">
@@ -519,7 +519,7 @@ Road Transparency & Accountability System`;
         <div className="flex-grow overflow-y-auto p-3 md:p-6 space-y-4 md:space-y-6 scroll-smooth min-h-0">
           {messages.map((msg) => (
             <div key={msg.id} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'} animate-fade-in w-full`}>
-              <div className={`flex w-full ${msg.component ? 'max-w-full' : 'max-w-[92%] sm:max-w-[85%] md:max-w-[70%]'} gap-2 md:gap-4 ${msg.sender === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
+              <div className={`flex w-full ${msg.component ? 'max-w-full' : 'max-w-[92%] sm:max-w-[85%] md:max-w-[75%]'} gap-2 md:gap-4 ${msg.sender === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
 
                 {/* Avatar */}
                 <div className={`shrink-0 w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center font-bold text-base md:text-lg shadow-md ${msg.sender === 'user'
@@ -551,25 +551,25 @@ Road Transparency & Accountability System`;
 
                   {/* Inline Components (Generative UI) */}
                   {msg.component === 'upload' && (
-                    <div className="w-full max-w-full sm:max-w-xl animate-fade-in">
+                    <div className="w-full max-w-full animate-fade-in">
                       <UploadImage onImageSet={handleImageUpload} />
                     </div>
                   )}
 
                   {msg.component === 'report' && (
-                    <div className="w-full max-w-full sm:max-w-2xl animate-fade-in">
+                    <div className="w-full max-w-full animate-fade-in">
                       <RoadReport data={msg.reportData} />
                     </div>
                   )}
 
                   {msg.component === 'letter' && (
-                    <div className="w-full max-w-full sm:max-w-2xl animate-fade-in">
+                    <div className="w-full max-w-full animate-fade-in">
                       <LetterEditor initialContent={msg.letterContent} onSubmit={handleLetterSubmit} />
                     </div>
                   )}
 
                   {msg.component === 'help_steps' && (
-                    <div className="w-full max-w-2xl animate-fade-in grid grid-cols-1 md:grid-cols-3 gap-4 mt-2">
+                    <div className="w-full max-w-2xl animate-fade-in grid grid-cols-1 sm:grid-cols-3 gap-3 mt-2">
                       <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex flex-col items-center text-center shadow-sm">
                         <div className="w-10 h-10 rounded-full bg-brand-500/10 text-brand-600 dark:text-brand-400 flex items-center justify-center mb-3">
                           <span className="font-bold">1</span>
@@ -603,7 +603,7 @@ Road Transparency & Accountability System`;
                         <button
                           key={opt.id}
                           onClick={() => handleOptionClick(opt)}
-                          className="flex items-center gap-1.5 px-3 md:px-4 py-2 bg-white dark:bg-slate-800 hover:bg-brand-50 dark:hover:bg-brand-500/20 text-brand-600 dark:text-brand-400 border border-brand-200 dark:border-brand-500/30 rounded-xl text-xs md:text-sm font-medium transition-all hover:-translate-y-0.5 active:scale-95 shadow-sm"
+                          className="flex items-center gap-1.5 px-3 py-2 bg-white dark:bg-slate-800 hover:bg-brand-50 dark:hover:bg-brand-500/20 text-brand-600 dark:text-brand-400 border border-brand-200 dark:border-brand-500/30 rounded-xl text-xs font-medium transition-all hover:-translate-y-0.5 active:scale-95 shadow-sm"
                         >
                           {opt.icon}
                           {opt.label}

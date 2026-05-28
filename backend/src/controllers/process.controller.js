@@ -42,55 +42,65 @@ exports.processAnalysis = async (req, res) => {
       return res.status(400).json({ error: 'Latitude and longitude are required' });
     }
 
-    // ── Step 4: Call Overpass API to detect road type (with mirror fallbacks) ──
+    // ── Step 4: Call Nominatim API (Primary) to detect road type and name ──
     let highwayTag = 'unknown';
     let roadName   = 'Unnamed Road';
-    const overpassUrls = [
-      `https://overpass-api.de/api/interpreter?data=[out:json];way(around:20,${lat},${lng})[highway];out tags;`,
-      `https://lz4.overpass-api.de/api/interpreter?data=[out:json];way(around:20,${lat},${lng})[highway];out tags;`,
-      `https://z.overpass-api.de/api/interpreter?data=[out:json];way(around:20,${lat},${lng})[highway];out tags;`,
-      `https://overpass.kumi.systems/api/interpreter?data=[out:json];way(around:20,${lat},${lng})[highway];out tags;`,
-      `https://overpass.nchc.org.tw/api/interpreter?data=[out:json];way(around:20,${lat},${lng})[highway];out tags;`
-    ];
+    let nominatimSuccess = false;
 
-    let overpassData = null;
-    for (const url of overpassUrls) {
-      try {
-        const overpassRes = await axios.get(url, {
-          timeout: 4000, // 4 seconds per attempt to failover quickly if a mirror is slow
-          headers: { 'User-Agent': 'RoadWatch/1.0 (road-transparency-app)' }
-        });
-        if (overpassRes.data && overpassRes.data.elements) {
-          overpassData = overpassRes.data;
-          break; // Successfully got data, stop trying other mirrors
+    try {
+      console.info(`📡 Querying Nominatim for road classification at coordinates: (${lat}, ${lng})...`);
+      const nominatimUrl = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`;
+      const nominatimRes = await axios.get(nominatimUrl, {
+        timeout: 4000,
+        headers: { 'User-Agent': 'RoadWatch/1.0 (road-transparency-app)' }
+      });
+      if (nominatimRes.data) {
+        const data = nominatimRes.data;
+        if (data.category === 'highway' || data.type) {
+          highwayTag = data.type || 'unknown';
         }
-      } catch (overpassErr) {
-        console.info(`ℹ️ Overpass API mirror busy/failed (${url}):`, overpassErr.message);
+        roadName = data.name || (data.address && (data.address.road || data.address.pedestrian)) || 'Unnamed Road';
+        nominatimSuccess = true;
+        console.info(`✅ Nominatim primary geocoding success: "${roadName}" (${highwayTag})`);
       }
+    } catch (nominatimErr) {
+      console.warn(`⚠️ Nominatim query failed:`, nominatimErr.message);
     }
 
-    if (overpassData && overpassData.elements.length > 0) {
-      const tags = overpassData.elements[0].tags;
-      highwayTag = tags.highway || 'unknown';
-      roadName   = tags.name || tags['name:en'] || tags['name:local'] || 'Unnamed Road';
-    } else {
-      console.info('⚠️ All Overpass API mirrors failed or returned empty results, trying Nominatim fallback...');
-      try {
-        const nominatimUrl = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`;
-        const nominatimRes = await axios.get(nominatimUrl, {
-          timeout: 4000,
-          headers: { 'User-Agent': 'RoadWatch/1.0 (road-transparency-app)' }
-        });
-        if (nominatimRes.data) {
-          const data = nominatimRes.data;
-          if (data.category === 'highway' || data.type) {
-            highwayTag = data.type || 'unknown';
+    // ── Backup Fallback: If Nominatim fails, try Overpass API mirrors ──
+    if (!nominatimSuccess) {
+      console.info('⚠️ Nominatim failed, attempting Overpass API mirrors as backup...');
+      const overpassUrls = [
+        `https://overpass-api.de/api/interpreter?data=[out:json];way(around:20,${lat},${lng})[highway];out tags;`,
+        `https://lz4.overpass-api.de/api/interpreter?data=[out:json];way(around:20,${lat},${lng})[highway];out tags;`,
+        `https://z.overpass-api.de/api/interpreter?data=[out:json];way(around:20,${lat},${lng})[highway];out tags;`,
+        `https://overpass.kumi.systems/api/interpreter?data=[out:json];way(around:20,${lat},${lng})[highway];out tags;`,
+        `https://overpass.nchc.org.tw/api/interpreter?data=[out:json];way(around:20,${lat},${lng})[highway];out tags;`
+      ];
+
+      let overpassData = null;
+      for (const url of overpassUrls) {
+        try {
+          const overpassRes = await axios.get(url, {
+            timeout: 4000,
+            headers: { 'User-Agent': 'RoadWatch/1.0 (road-transparency-app)' }
+          });
+          if (overpassRes.data && overpassRes.data.elements) {
+            overpassData = overpassRes.data;
+            break;
           }
-          roadName = data.name || (data.address && (data.address.road || data.address.pedestrian)) || 'Unnamed Road';
-          console.info(`✅ Nominatim fallback successful: "${roadName}" (${highwayTag})`);
+        } catch (overpassErr) {
+          console.info(`ℹ️ Overpass API mirror busy/failed (${url}):`, overpassErr.message);
         }
-      } catch (nominatimErr) {
-        console.warn('❌ Nominatim fallback failed:', nominatimErr.message);
+      }
+
+      if (overpassData && overpassData.elements.length > 0) {
+        const tags = overpassData.elements[0].tags;
+        highwayTag = tags.highway || 'unknown';
+        roadName   = tags.name || tags['name:en'] || tags['name:local'] || 'Unnamed Road';
+        console.info(`✅ Overpass fallback success: "${roadName}" (${highwayTag})`);
+      } else {
+        console.warn('⚠️ All Overpass API mirrors also failed or returned empty results, using default values.');
       }
     }
 

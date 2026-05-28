@@ -182,7 +182,7 @@ Road Transparency & Accountability System`;
           {
             id: Date.now() + 1,
             sender: 'bot',
-            text: "Please capture or upload a geotagged photo of the issue. I will analyze it and draft a formal complaint letter for the authorities.",
+            text: "Please capture or upload a photo of the issue. I will analyze it and draft a formal complaint letter for the authorities.",
             component: 'upload'
           }
         ]);

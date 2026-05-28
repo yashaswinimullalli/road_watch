@@ -4,12 +4,14 @@ import AdminDashboard from './pages/AdminDashboard';
 import ReportDetails from './pages/ReportDetails';
 import HowItWorks from './pages/HowItWorks';
 import ContactSupport from './pages/ContactSupport';
-import { Home as HomeIcon, Moon, Sun } from 'lucide-react';
+import { Home as HomeIcon, Moon, Sun, Menu, X, LayoutDashboard, HelpCircle, Phone, Clock, AlertTriangle } from 'lucide-react';
 import { useState, useEffect } from 'react';
+
 
 function Navbar({ theme, toggleTheme }) {
   const location = useLocation();
   const [scrolled, setScrolled] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -19,45 +21,146 @@ function Navbar({ theme, toggleTheme }) {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Close menu when route changes
+  useEffect(() => {
+    setIsOpen(false);
+  }, [location.pathname]);
+
+  const navLinks = [
+    { to: '/', label: 'Home', icon: <HomeIcon className="w-4 h-4" /> },
+    { to: '/admin', label: 'City Dashboard', icon: <LayoutDashboard className="w-4 h-4" /> },
+    { to: '/how-it-works', label: 'How It Works', icon: <HelpCircle className="w-4 h-4" /> },
+    { to: '/contact-support', label: 'Contact Support', icon: <Phone className="w-4 h-4" /> },
+  ];
+
   return (
-    <nav className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 ${scrolled ? 'bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg border-b border-slate-200 dark:border-slate-800 py-2 md:py-3 shadow-sm' : 'bg-transparent py-3 md:py-6'}`}>
-      <div className="max-w-7xl mx-auto px-3 md:px-6 flex items-center justify-between gap-2">
-        <Link to="/" className="flex items-center gap-1.5 md:gap-2 group shrink-0 min-w-0">
-          <div className="w-8 h-8 md:w-10 md:h-10 shrink-0 rounded-xl bg-brand-500 flex items-center justify-center text-white font-bold text-base md:text-xl shadow-lg transition-transform group-hover:scale-105">
-            R
-          </div>
-          <span className="text-sm sm:text-base md:text-xl font-bold tracking-tight text-slate-900 dark:text-white transition-colors truncate">
-            RoadSathi
-          </span>
-        </Link>
-        
-        <div className="flex items-center gap-1.5 md:gap-2 shrink-0">
-          <div className="flex items-center gap-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-1 md:px-1.5 py-1 md:py-1.5 rounded-2xl shadow-sm">
-            <Link
-              to="/"
-              className={`flex items-center gap-1 md:gap-1.5 px-2 md:px-3 py-1.5 rounded-xl text-xs md:text-sm font-medium transition-all ${
-                location.pathname === '/' 
-                  ? 'bg-brand-500/10 text-brand-500 dark:text-brand-400' 
-                  : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700/50'
-              }`}
-            >
-              <HomeIcon className="w-4 h-4 md:w-5 md:h-5 shrink-0" />
-              <span className="hidden sm:inline">Home</span>
-            </Link>
-          </div>
+    <>
+      <nav className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 ${scrolled ? 'bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg border-b border-slate-200 dark:border-slate-800 py-2 md:py-3 shadow-sm' : 'bg-transparent py-3 md:py-6'}`}>
+        <div className="max-w-7xl mx-auto px-3 md:px-6 flex items-center justify-between gap-2">
+          <Link to="/" className="flex items-center gap-1.5 md:gap-2 group shrink-0 min-w-0">
+            <div className="w-8 h-8 md:w-10 md:h-10 shrink-0 rounded-xl bg-brand-500 flex items-center justify-center text-white font-bold text-base md:text-xl shadow-lg transition-transform group-hover:scale-105">
+              R
+            </div>
+            <span className="text-sm sm:text-base md:text-xl font-bold tracking-tight text-slate-900 dark:text-white transition-colors truncate">
+              RoadSathi
+            </span>
+          </Link>
           
-          <button 
-            onClick={toggleTheme}
-            className="p-2 md:p-2.5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:text-brand-500 dark:hover:text-brand-400 hover:shadow-md transition-all active:scale-95 shadow-sm"
-            aria-label="Toggle Theme"
-          >
-            {theme === 'dark' ? <Sun className="w-4 h-4 md:w-5 md:h-5" /> : <Moon className="w-4 h-4 md:w-5 md:h-5" />}
-          </button>
+          <div className="flex items-center gap-1.5 md:gap-2 shrink-0">
+            {/* Desktop Navigation Links */}
+            <div className="hidden lg:flex items-center gap-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-1.5 py-1.5 rounded-2xl shadow-sm">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.to}
+                  to={link.to}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs md:text-sm font-medium transition-all ${
+                    location.pathname === link.to 
+                      ? 'bg-brand-500/10 text-brand-500 dark:text-brand-400' 
+                      : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700/50'
+                  }`}
+                >
+                  {link.icon}
+                  <span>{link.label}</span>
+                </Link>
+              ))}
+            </div>
+
+            {/* Mobile Home Icon (Standalone shortcut) */}
+            <div className="lg:hidden flex items-center gap-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-1 py-1 rounded-2xl shadow-sm">
+              <Link
+                to="/"
+                className={`flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-medium transition-all ${
+                  location.pathname === '/' 
+                    ? 'bg-brand-500/10 text-brand-500 dark:text-brand-400' 
+                    : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700/50'
+                }`}
+                aria-label="Home"
+              >
+                <HomeIcon className="w-4 h-4 shrink-0" />
+              </Link>
+            </div>
+            
+            {/* Theme Toggle Button */}
+            <button 
+              onClick={toggleTheme}
+              className="p-2 md:p-2.5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:text-brand-500 dark:hover:text-brand-400 hover:shadow-md transition-all active:scale-95 shadow-sm"
+              aria-label="Toggle Theme"
+            >
+              {theme === 'dark' ? <Sun className="w-4 h-4 md:w-5 md:h-5" /> : <Moon className="w-4 h-4 md:w-5 md:h-5" />}
+            </button>
+
+            {/* Mobile Drawer Toggle Button */}
+            <button 
+              onClick={() => setIsOpen(!isOpen)}
+              className="lg:hidden p-2 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:text-brand-500 dark:hover:text-brand-400 hover:shadow-md transition-all active:scale-95 shadow-sm"
+              aria-label="Toggle Menu"
+            >
+              {isOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+            </button>
+          </div>
         </div>
-      </div>
-    </nav>
+      </nav>
+
+      {/* Mobile Drawer Menu */}
+      {isOpen && (
+        <div className="fixed inset-0 z-40 lg:hidden animate-fade-in">
+          {/* Backdrop */}
+          <div 
+            className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"
+            onClick={() => setIsOpen(false)}
+          ></div>
+          
+          {/* Drawer Panel */}
+          <div className="absolute right-0 top-0 bottom-0 w-72 bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800 shadow-2xl flex flex-col p-6 pt-24 animate-slide-up">
+            <div className="mb-6">
+              <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-widest">Navigation</h3>
+            </div>
+
+            <div className="flex flex-col gap-2 flex-grow">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.to}
+                  to={link.to}
+                  className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+                    location.pathname === link.to 
+                      ? 'bg-brand-500/10 text-brand-500 dark:text-brand-400' 
+                      : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/60'
+                  }`}
+                >
+                  <span className="p-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200/50 dark:border-slate-700/50">
+                    {link.icon}
+                  </span>
+                  <span>{link.label}</span>
+                </Link>
+              ))}
+
+              {/* History shortcut section inside drawer */}
+              <div className="border-t border-slate-150 dark:border-slate-800/80 my-4 pt-4">
+                <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-1.5">
+                  <Clock className="w-3.5 h-3.5" /> Recent Actions
+                </h3>
+                <div className="flex flex-col gap-2">
+                  <Link
+                    to={localStorage.getItem('lastReportId') ? `/report/${localStorage.getItem('lastReportId')}` : '/report'}
+                    className="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-all"
+                  >
+                    <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0" />
+                    <span>Review Last Report</span>
+                  </Link>
+                </div>
+              </div>
+            </div>
+
+            <div className="border-t border-slate-200 dark:border-slate-800 pt-4 mt-auto">
+              <p className="text-xxs text-slate-400 text-center">RoadSathi Platform v1.0.0</p>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
+
 
 function App() {
   const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'light');

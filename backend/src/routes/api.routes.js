@@ -2,12 +2,16 @@ const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 const processController = require('../controllers/process.controller');
+const validateController = require('../controllers/validate.controller');
 
 // Multer — store image in memory so we can forward the buffer to the AI service
 const upload = multer({ storage: multer.memoryStorage() });
 
 // Main POST route — accepts multipart/form-data with an optional image file
 router.post('/analyze-road', upload.single('image'), processController.processAnalysis);
+
+// Image validation route — call BEFORE /analyze-road to pre-screen uploads
+router.post('/validate-image', upload.single('image'), validateController.validateRoadImage);
 
 // Route for storing readable location
 router.post('/location', async (req, res) => {

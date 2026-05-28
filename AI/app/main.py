@@ -15,6 +15,7 @@ from pathlib import Path
 # Import services
 from .services.detector import ModelLoader
 from .routes.analyze import router as analyze_router
+from .routes.validate import router as validate_router
 
 
 # Model path configuration
@@ -74,6 +75,7 @@ app.add_middleware(
 
 # Include API routers
 app.include_router(analyze_router)
+app.include_router(validate_router)
 
 
 # Root endpoint

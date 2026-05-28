@@ -4,12 +4,13 @@ import { Send, AlertTriangle, LayoutDashboard, HelpCircle, Phone, Clock, FileTex
 import UploadImage from '../components/UploadImage';
 import LetterEditor from '../components/LetterEditor';
 import RoadReport from '../components/RoadReport';
+import ToastNotification from '../components/ToastNotification';
 
 export default function Home({ coords }) {
   const navigate = useNavigate();
   const [inputText, setInputText] = useState('');
   const messagesEndRef = useRef(null);
-  
+
   const [messages, setMessages] = useState([
     {
       id: 1,
@@ -24,6 +25,12 @@ export default function Home({ coords }) {
     }
   ]);
   const [isTyping, setIsTyping] = useState(false);
+
+  // ── Image validation toast state ────────────────────────────────────────
+  const [toast, setToast] = useState({ visible: false, message: '', type: 'warning' });
+  const showToast = (message, type = 'warning') =>
+    setToast({ visible: true, message, type });
+  const hideToast = () => setToast(prev => ({ ...prev, visible: false }));
 
   // Mock User History Data
   const reportingHistory = [
@@ -46,35 +53,35 @@ export default function Home({ coords }) {
   const generateCitizenLetter = (data) => {
     const authority = data?.authority || 'Local Municipal Corporations';
     const rawLocation = data?.location || '';
-    
+
     // Parse location address parts to extract City, State, and Area
     let area = 'Local Area';
     let city = 'Bengaluru';
     let state = 'Karnataka';
     let fullAddress = rawLocation || 'Coordinates: Lat/Lng';
-    
+
     if (rawLocation && rawLocation.includes(',')) {
       const parts = rawLocation.split(',').map(p => p.trim());
-      
+
       // Filter out empty parts
       const cleanParts = parts.filter(Boolean);
-      
+
       // Nominatim addresses typically end with: [..., City/District, State/Province, Postal Code, Country]
       // Let's locate the state (usually the item before postal/country, e.g., Karnataka)
       if (cleanParts.length >= 3) {
         // Find state by searching backward, ignoring Country and postal code numbers
         let stateIndex = cleanParts.length - 1;
-        
+
         // Skip last item if it is Country (like "India")
         if (cleanParts[stateIndex].toLowerCase() === 'india') {
           stateIndex--;
         }
-        
+
         // Skip next item if it is a number (postal code, e.g. "560064")
         if (stateIndex >= 0 && /^\d+$/.test(cleanParts[stateIndex])) {
           stateIndex--;
         }
-        
+
         if (stateIndex >= 0) {
           state = cleanParts[stateIndex];
           // City is typically 1 or 2 items before the state
@@ -83,7 +90,7 @@ export default function Home({ coords }) {
           }
         }
       }
-      
+
       // Determine a readable local area
       area = cleanParts[1] || cleanParts[0] || 'Local Area';
     } else if (rawLocation) {
@@ -95,11 +102,11 @@ export default function Home({ coords }) {
     const roadDamage = data?.issueType || data?.roadDamage || 'Pothole';
     const severity = data?.severity || 'High';
     const condition = data?.condition || 'Poor';
-    
+
     const contractor = data?.contractor || 'Local Road Contractor';
     const budgetAllocated = data?.budgetAllocated || '₹50 Lakhs';
     const amountSpent = data?.amountSpent || '₹42 Lakhs';
-    
+
     // Format dates
     const date = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
     let lastRelayingDate = 'N/A';
@@ -164,7 +171,7 @@ Road Transparency & Accountability System`;
       navigate('/admin');
       return;
     }
-    
+
     setMessages(prev => [...prev, { id: Date.now(), sender: 'user', text: option.label }]);
     setIsTyping(true);
 
@@ -172,9 +179,9 @@ Road Transparency & Accountability System`;
       setTimeout(() => {
         setMessages(prev => [
           ...prev,
-          { 
-            id: Date.now() + 1, 
-            sender: 'bot', 
+          {
+            id: Date.now() + 1,
+            sender: 'bot',
             text: "Please capture or upload a geotagged photo of the issue. I will analyze it and draft a formal complaint letter for the authorities.",
             component: 'upload'
           }
@@ -183,7 +190,7 @@ Road Transparency & Accountability System`;
       }, 1000);
       return;
     }
-    
+
     setTimeout(() => {
       if (option.id === 'help') {
         setMessages(prev => [
@@ -208,17 +215,17 @@ Road Transparency & Accountability System`;
 
   const handleUserMessage = (text) => {
     if (!text.trim()) return;
-    
+
     const userMsg = { id: Date.now(), sender: 'user', text };
     setMessages(prev => [...prev, userMsg]);
     setInputText('');
     setIsTyping(true);
-    
+
     setTimeout(() => {
-      setMessages(prev => [...prev, { 
-        id: Date.now() + 1, 
-        sender: 'bot', 
-        text: "I am currently in demo mode. Please click 'Report a Problem' to see my Generative UI capabilities in action!" 
+      setMessages(prev => [...prev, {
+        id: Date.now() + 1,
+        sender: 'bot',
+        text: "I am currently in demo mode. Please click 'Report a Problem' to see my Generative UI capabilities in action!"
       }]);
       setIsTyping(false);
     }, 1000);
@@ -273,6 +280,38 @@ Road Transparency & Accountability System`;
     if (!imgData) return;
     setIsTyping(true);
 
+    // ── Image Validation: pre-screen before any AI analysis ─────────────────
+    // Call the lightweight /validate-image endpoint first.
+    // If validation fails → show toast and abort immediately.
+    // If service is unreachable → fail-open (don't block the user).
+    try {
+      const validationBlob = await fetch(imgData).then(r => r.blob());
+      const validationForm = new FormData();
+      validationForm.append('image', validationBlob, 'check.jpg');
+
+      const validationRes = await fetch('http://localhost:5000/api/validate-image', {
+        method: 'POST',
+        body:   validationForm,
+      });
+
+      if (validationRes.ok) {
+        const validationData = await validationRes.json();
+        if (!validationData.isValid) {
+          // Not a road image — stop immediately, show warning toast
+          setIsTyping(false);
+          showToast(
+            'Please upload a valid road or road damage image for analysis.',
+            'warning'
+          );
+          return; // ← halts: no AI analysis, no complaint, no DB write
+        }
+      }
+      // If endpoint unreachable, fall through (fail-open)
+    } catch (validationErr) {
+      console.warn('Image validation skipped (service unavailable):', validationErr.message);
+    }
+    // ── End Validation ───────────────────────────────────────────────────────
+
     setMessages(prev => [...prev, {
       id: Date.now(),
       sender: 'bot',
@@ -294,8 +333,8 @@ Road Transparency & Accountability System`;
 
       const formData = new FormData();
       formData.append('image', imageBlob, 'road-image.jpg');
-      formData.append('lat',  activeCoords.latitude);
-      formData.append('lng',  activeCoords.longitude);
+      formData.append('lat', activeCoords.latitude);
+      formData.append('lng', activeCoords.longitude);
       if (activeCoords.address) formData.append('locationString', activeCoords.address);
 
       const controller = new AbortController();
@@ -303,7 +342,7 @@ Road Transparency & Accountability System`;
 
       const res = await fetch('http://localhost:5000/api/analyze-road', {
         method: 'POST',
-        body:   formData,
+        body: formData,
         signal: controller.signal
       });
 
@@ -343,6 +382,8 @@ Road Transparency & Accountability System`;
           {
             id: Date.now() + 1,
             sender: 'bot',
+
+
             text: isRealAI
               ? '✅ AI analysis complete! Here is the live road transparency report:'
               : '✅ Analysis complete! Here is the road transparency report for your area:',
@@ -391,9 +432,9 @@ Road Transparency & Accountability System`;
     setTimeout(() => {
       setMessages(prev => [
         ...prev,
-        { 
-          id: Date.now(), 
-          sender: 'bot', 
+        {
+          id: Date.now(),
+          sender: 'bot',
           text: "Excellent! Your report has been officially filed. You can track community issues and view the updated poll on the Dashboard.",
           options: [
             { id: 'dashboard', label: 'Go to Dashboard', icon: <LayoutDashboard className="w-4 h-4" /> }
@@ -406,7 +447,7 @@ Road Transparency & Accountability System`;
 
   return (
     <div className="max-w-7xl mx-auto w-full flex-grow flex gap-3 md:gap-6 min-h-0" style={{ height: 'calc(100dvh - 80px)' }}>
-      
+
       {/* Left Sidebar - User History (Visible on large screens) */}
       <div className="hidden lg:flex w-72 flex-col bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-xl transition-colors duration-300 shrink-0">
         <div className="p-5 border-b border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30">
@@ -416,11 +457,11 @@ Road Transparency & Accountability System`;
           </h2>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Recent activity and reports</p>
         </div>
-        
+
         <div className="flex-1 overflow-y-auto p-4 space-y-3">
           {reportingHistory.map((item) => (
-            <div 
-              key={item.id} 
+            <div
+              key={item.id}
               onClick={() => {
                 if (item.isReport) {
                   const lastId = localStorage.getItem('lastReportId');
@@ -450,11 +491,10 @@ Road Transparency & Accountability System`;
               {!item.isReport && !item.isHowItWorks && !item.isContactSupport && (
                 <div className="flex items-center justify-between mt-3 text-xs">
                   <span className="text-slate-500">{item.date}</span>
-                  <span className={`px-2 py-0.5 rounded-full font-medium ${
-                    item.status === 'Resolved' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400' :
+                  <span className={`px-2 py-0.5 rounded-full font-medium ${item.status === 'Resolved' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400' :
                     item.status === 'In Progress' ? 'bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400' :
-                    'bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-300'
-                  }`}>
+                      'bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-300'
+                    }`}>
                     {item.status}
                   </span>
                 </div>
@@ -462,9 +502,9 @@ Road Transparency & Accountability System`;
             </div>
           ))}
         </div>
-        
+
         <div className="p-4 border-t border-slate-200 dark:border-slate-800">
-          <button 
+          <button
             onClick={() => navigate('/admin')}
             className="w-full py-2.5 px-4 bg-brand-50 dark:bg-brand-500/10 text-brand-600 dark:text-brand-400 font-medium text-sm rounded-xl hover:bg-brand-100 dark:hover:bg-brand-500/20 transition-colors flex items-center justify-center gap-2"
           >
@@ -480,25 +520,23 @@ Road Transparency & Accountability System`;
           {messages.map((msg) => (
             <div key={msg.id} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'} animate-fade-in w-full`}>
               <div className={`flex w-full ${msg.component ? 'max-w-full' : 'max-w-[92%] sm:max-w-[85%] md:max-w-[70%]'} gap-2 md:gap-4 ${msg.sender === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
-                
+
                 {/* Avatar */}
-                <div className={`shrink-0 w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center font-bold text-base md:text-lg shadow-md ${
-                  msg.sender === 'user' 
-                    ? 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-white' 
-                    : 'bg-brand-500 text-white'
-                }`}>
+                <div className={`shrink-0 w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center font-bold text-base md:text-lg shadow-md ${msg.sender === 'user'
+                  ? 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-white'
+                  : 'bg-brand-500 text-white'
+                  }`}>
                   {msg.sender === 'user' ? 'U' : 'S'}
                 </div>
 
                 {/* Message Content */}
                 <div className={`flex flex-col gap-3 ${msg.sender === 'user' ? 'items-end' : 'items-start'} ${msg.component ? 'w-full pr-0 sm:pr-14' : ''} min-w-0`}>
-                  <div className={`p-3 md:p-4 rounded-2xl text-sm md:text-base leading-relaxed shadow-sm ${
-                    msg.sender === 'user' 
-                      ? 'bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 rounded-tr-sm border border-slate-200 dark:border-slate-700' 
-                      : msg.isDuplicate
-                        ? 'bg-amber-50 dark:bg-amber-950/20 text-amber-800 dark:text-amber-300 rounded-tl-sm border border-amber-200 dark:border-amber-800/30'
-                        : 'bg-slate-50 dark:bg-slate-800/80 text-slate-800 dark:text-slate-200 rounded-tl-sm border border-slate-200 dark:border-slate-700/50'
-                  }`}>
+                  <div className={`p-3 md:p-4 rounded-2xl text-sm md:text-base leading-relaxed shadow-sm ${msg.sender === 'user'
+                    ? 'bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 rounded-tr-sm border border-slate-200 dark:border-slate-700'
+                    : msg.isDuplicate
+                      ? 'bg-amber-50 dark:bg-amber-950/20 text-amber-800 dark:text-amber-300 rounded-tl-sm border border-amber-200 dark:border-amber-800/30'
+                      : 'bg-slate-50 dark:bg-slate-800/80 text-slate-800 dark:text-slate-200 rounded-tl-sm border border-slate-200 dark:border-slate-700/50'
+                    }`}>
                     {msg.isDuplicate ? (
                       <div className="flex items-start gap-2.5">
                         <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
@@ -517,7 +555,7 @@ Road Transparency & Accountability System`;
                       <UploadImage onImageSet={handleImageUpload} />
                     </div>
                   )}
-                  
+
                   {msg.component === 'report' && (
                     <div className="w-full max-w-full sm:max-w-2xl animate-fade-in">
                       <RoadReport data={msg.reportData} />
@@ -539,7 +577,7 @@ Road Transparency & Accountability System`;
                         <h4 className="font-bold text-sm text-slate-800 dark:text-white mb-1">Snap & Geotag</h4>
                         <p className="text-xs text-slate-500 dark:text-slate-400">Capture the road hazard. Your browser automatically fetches your location & reverse-geocodes it.</p>
                       </div>
-                      
+
                       <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex flex-col items-center text-center shadow-sm">
                         <div className="w-10 h-10 rounded-full bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mb-3">
                           <span className="font-bold">2</span>
@@ -547,7 +585,7 @@ Road Transparency & Accountability System`;
                         <h4 className="font-bold text-sm text-slate-800 dark:text-white mb-1">YOLOv8 AI & Overpass</h4>
                         <p className="text-xs text-slate-500 dark:text-slate-400">Our real-time AI analyzes the damage type & severity, mapping it to ownership records from the Overpass API.</p>
                       </div>
-                      
+
                       <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex flex-col items-center text-center shadow-sm">
                         <div className="w-10 h-10 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mb-3">
                           <span className="font-bold">3</span>
@@ -577,7 +615,7 @@ Road Transparency & Accountability System`;
               </div>
             </div>
           ))}
-          
+
           {isTyping && (
             <div className="flex justify-start animate-fade-in">
               <div className="flex gap-4">
@@ -597,7 +635,7 @@ Road Transparency & Accountability System`;
 
         {/* Input Area */}
         <div className="p-3 md:p-5 bg-slate-50/80 dark:bg-slate-900/80 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 transition-colors duration-300">
-          <form 
+          <form
             onSubmit={(e) => { e.preventDefault(); handleUserMessage(inputText); }}
             className="relative max-w-4xl mx-auto flex items-center"
           >
@@ -611,11 +649,10 @@ Road Transparency & Accountability System`;
             <button
               type="submit"
               disabled={!inputText.trim()}
-              className={`absolute right-2 p-2 md:p-2.5 rounded-xl flex items-center justify-center transition-all ${
-                inputText.trim() 
-                  ? 'bg-brand-500 text-white hover:bg-brand-600 shadow-lg' 
-                  : 'bg-slate-200 dark:bg-slate-700 text-slate-400 dark:text-slate-500 cursor-not-allowed'
-              }`}
+              className={`absolute right-2 p-2 md:p-2.5 rounded-xl flex items-center justify-center transition-all ${inputText.trim()
+                ? 'bg-brand-500 text-white hover:bg-brand-600 shadow-lg'
+                : 'bg-slate-200 dark:bg-slate-700 text-slate-400 dark:text-slate-500 cursor-not-allowed'
+                }`}
             >
               <Send className="w-4 h-4 md:w-5 md:h-5" />
             </button>
@@ -625,6 +662,15 @@ Road Transparency & Accountability System`;
           </p>
         </div>
       </div>
+
+      {/* Image Validation Toast — fixed position, overlays entire viewport */}
+      <ToastNotification
+        message={toast.message}
+        type={toast.type}
+        visible={toast.visible}
+        onClose={hideToast}
+        duration={6000}
+      />
     </div>
   );
 }

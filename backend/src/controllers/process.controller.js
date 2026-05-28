@@ -35,23 +35,37 @@ exports.processAnalysis = async (req, res) => {
       return res.status(400).json({ error: 'Latitude and longitude are required' });
     }
 
-    // ── Step 4: Call Overpass API to detect road type ──
+    // ── Step 4: Call Overpass API to detect road type (with mirror fallbacks) ──
     let highwayTag = 'unknown';
     let roadName   = 'Unnamed Road';
-    try {
-      const overpassUrl = `https://overpass-api.de/api/interpreter?data=[out:json];way(around:20,${lat},${lng})[highway];out tags;`;
-      const overpassRes = await axios.get(overpassUrl, {
-        timeout: 8000,
-        headers: { 'User-Agent': 'RoadWatch/1.0 (road-transparency-app)' }
-      });
+    const overpassUrls = [
+      `https://overpass-api.de/api/interpreter?data=[out:json];way(around:20,${lat},${lng})[highway];out tags;`,
+      `https://lz4.overpass-api.de/api/interpreter?data=[out:json];way(around:20,${lat},${lng})[highway];out tags;`,
+      `https://z.overpass-api.de/api/interpreter?data=[out:json];way(around:20,${lat},${lng})[highway];out tags;`
+    ];
 
-      if (overpassRes.data && overpassRes.data.elements.length > 0) {
-        const tags = overpassRes.data.elements[0].tags;
-        highwayTag = tags.highway || 'unknown';
-        roadName   = tags.name || tags['name:en'] || tags['name:local'] || 'Unnamed Road';
+    let overpassData = null;
+    for (const url of overpassUrls) {
+      try {
+        const overpassRes = await axios.get(url, {
+          timeout: 10000, // 10 seconds per attempt
+          headers: { 'User-Agent': 'RoadWatch/1.0 (road-transparency-app)' }
+        });
+        if (overpassRes.data && overpassRes.data.elements) {
+          overpassData = overpassRes.data;
+          break; // Successfully got data, stop trying other mirrors
+        }
+      } catch (overpassErr) {
+        console.warn(`⚠️ Overpass API mirror failed (${url}):`, overpassErr.message);
       }
-    } catch (overpassErr) {
-      console.warn('⚠️ Overpass API error, using fallbacks:', overpassErr.message);
+    }
+
+    if (overpassData && overpassData.elements.length > 0) {
+      const tags = overpassData.elements[0].tags;
+      highwayTag = tags.highway || 'unknown';
+      roadName   = tags.name || tags['name:en'] || tags['name:local'] || 'Unnamed Road';
+    } else {
+      console.warn('⚠️ All Overpass API mirrors failed or returned empty results, using fallbacks.');
     }
 
     // ── Step 5: Map highway tag → road type ──
@@ -91,7 +105,7 @@ exports.processAnalysis = async (req, res) => {
 
         const aiRes = await axios.post(AI_SERVICE_URL, formData, {
           headers: { ...formData.getHeaders() },
-          timeout: 30000
+          timeout: 90000 // 90 s — allow Render AI service to wake up from cold start
         });
 
         aiResult = aiRes.data;

@@ -30,7 +30,7 @@ exports.validateRoadImage = async (req, res) => {
 
     const aiRes = await axios.post(AI_VALIDATE_URL, formData, {
       headers: { ...formData.getHeaders() },
-      timeout: 15000, // 15 s — lighter than full analysis timeout
+      timeout: 60000, // 60 s — allow Render AI service to wake up from cold start
     });
 
     const { is_valid, class_name, confidence, message } = aiRes.data;

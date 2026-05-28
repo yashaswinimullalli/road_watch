@@ -20,7 +20,7 @@ from .routes.validate import router as validate_router
 
 # Model path configuration
 MODEL_DIR = Path(__file__).parent / "models"
-MODEL_PATH = str(MODEL_DIR / "pothole.pt")
+MODEL_PATH = str(MODEL_DIR / "pothole.onnx")
 
 
 # Lifespan context manager for startup/shutdown
@@ -36,11 +36,11 @@ async def lifespan(app: FastAPI):
         print(f"Loading model from: {MODEL_PATH}")
         if not os.path.exists(MODEL_PATH):
             print(f"WARNING: Model file not found at {MODEL_PATH}")
-            print("Make sure models/pothole.pt exists in the app directory")
+            print("Make sure models/pothole.onnx exists in the app directory")
         else:
             loader = ModelLoader()
             loader.load_model(MODEL_PATH)
-            print("✓ YOLOv8 classification model loaded successfully")
+            print("[OK] YOLOv8 classification model (ONNX) loaded successfully")
     except Exception as e:
         print(f"ERROR: Failed to load model: {str(e)}")
         raise

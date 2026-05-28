@@ -74,7 +74,24 @@ exports.processAnalysis = async (req, res) => {
       highwayTag = tags.highway || 'unknown';
       roadName   = tags.name || tags['name:en'] || tags['name:local'] || 'Unnamed Road';
     } else {
-      console.warn('⚠️ All Overpass API mirrors failed or returned empty results, using fallbacks.');
+      console.info('⚠️ All Overpass API mirrors failed or returned empty results, trying Nominatim fallback...');
+      try {
+        const nominatimUrl = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`;
+        const nominatimRes = await axios.get(nominatimUrl, {
+          timeout: 4000,
+          headers: { 'User-Agent': 'RoadWatch/1.0 (road-transparency-app)' }
+        });
+        if (nominatimRes.data) {
+          const data = nominatimRes.data;
+          if (data.category === 'highway' || data.type) {
+            highwayTag = data.type || 'unknown';
+          }
+          roadName = data.name || (data.address && (data.address.road || data.address.pedestrian)) || 'Unnamed Road';
+          console.info(`✅ Nominatim fallback successful: "${roadName}" (${highwayTag})`);
+        }
+      } catch (nominatimErr) {
+        console.warn('❌ Nominatim fallback failed:', nominatimErr.message);
+      }
     }
 
     // ── Step 5: Map highway tag → road type ──

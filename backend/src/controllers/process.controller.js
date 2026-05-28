@@ -22,6 +22,33 @@ const mapRoadType = (highwayTag) => {
   return 'Other Road'; // Fallback for tertiary, residential, service, unclassified, etc.
 };
 
+// Maps Overpass/Nominatim highway tag → detailed human-readable road classification (additional layer)
+const mapDetailedRoadClassification = (highwayTag) => {
+  const tag = (highwayTag || '').toLowerCase().trim();
+  if (!tag || tag === 'unknown') {
+    return 'Unknown Road Category';
+  }
+  if (tag.startsWith('motorway') || tag.startsWith('trunk')) {
+    return 'National Highway (NH)';
+  }
+  if (tag.startsWith('primary')) {
+    return 'State Highway (SH)';
+  }
+  if (tag.startsWith('secondary')) {
+    return 'Major District Road (MDR) / Urban Arterial Road';
+  }
+  if (tag.startsWith('tertiary')) {
+    return 'Other District Road (ODR)';
+  }
+  if (tag.startsWith('residential') || tag.startsWith('service') || tag.startsWith('unclassified')) {
+    return 'Local Road';
+  }
+  if (tag.startsWith('track')) {
+    return 'Rural Access Road / Village Road';
+  }
+  return 'Unknown Road Category';
+};
+
 // Formats a date value to YYYY-MM-DD string for the AI service
 const toDateString = (dateVal) => {
   try {
@@ -106,6 +133,7 @@ exports.processAnalysis = async (req, res) => {
 
     // ── Step 5: Map highway tag → road type ──
     const mappedRoadType = mapRoadType(highwayTag);
+    const detailedClassification = mapDetailedRoadClassification(highwayTag);
 
     // ── Step 6: Fetch matching transparency data from BackendCluster ──
     const matchingRoadData = await Road.aggregate([
@@ -201,6 +229,7 @@ exports.processAnalysis = async (req, res) => {
           roadName,
           highwayTag,
           roadType:         mappedRoadType,
+          detailedClassification,
           contractor:       roadInfo?.contractor      || 'Unknown',
           budgetAllocated:  roadInfo?.budgetAllocated || 'N/A',
           amountSpent:      roadInfo?.amountSpent     || 'N/A',
@@ -255,6 +284,7 @@ exports.processAnalysis = async (req, res) => {
         roadName,
         highwayTag,
         roadType:         mappedRoadType,
+        detailedClassification,
         contractor:       roadInfo?.contractor      || 'Unknown',
         budgetAllocated:  roadInfo?.budgetAllocated || 'N/A',
         amountSpent:      roadInfo?.amountSpent     || 'N/A',

@@ -26,7 +26,7 @@ The platform promotes **community-driven road transparency** by making every com
 | Feature | Description |
 |---|---|
 | 📍 **GPS Location Detection** | Auto-detects user location for precise issue mapping |
-| 🗺️ **Overpass API Road Identification** | Identifies the exact road using OpenStreetMap data |
+| 🗺️ **Nominatim & Overpass Geocoding** | Resolves address and road types with resilient fallbacks |
 | 🏷️ **Road Type Classification** | Classifies roads as NH / SH / MDR / Other Road |
 | 🤖 **AI Road Damage Analysis** | Analyzes uploaded images for visible road damage |
 | 📊 **Severity & Test Score Detection** | Generates damage severity level and a structured test score |
@@ -58,7 +58,7 @@ The platform promotes **community-driven road transparency** by making every com
 - **AI Image Analysis** – Road damage detection, severity scoring, condition analysis
 
 ### External APIs
-- **Overpass API** – Road type identification via OpenStreetMap
+- **Nominatim & Overpass API** – Primary geocoding and resilient road type identification via OpenStreetMap
 - **Reverse Geocoding API** – Converts GPS coordinates to readable addresses
 
 ---

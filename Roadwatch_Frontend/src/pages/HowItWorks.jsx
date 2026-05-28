@@ -7,13 +7,13 @@ export default function HowItWorks() {
   const steps = [
     {
       icon: <MapPin className="w-5 h-5 text-brand-600 dark:text-brand-400" />,
-      title: "GPS Location Detection",
-      desc: "Requests coordinates from your browser. Nominatim OpenStreetMap reverse-geocodes it into a precise, human-readable address."
+      title: "GPS Location & Geocoding",
+      desc: "Requests coordinates from your browser and queries the Nominatim OpenStreetMap reverse geocoder at zoom level 17 to resolve a precise address and retrieve road tags."
     },
     {
       icon: <Compass className="w-5 h-5 text-blue-600 dark:text-blue-400" />,
-      title: "Overpass API Road Detection",
-      desc: "Queries the OpenStreetMap database to identify the road classification (residential, secondary, primary, etc.) and jurisdiction."
+      title: "Resilient Road Classification",
+      desc: "Identifies the road name and ownership. If Nominatim is busy or fails, the system falls back to a sequence of Overpass API mirrors for query reliability."
     },
     {
       icon: <Cpu className="w-5 h-5 text-red-600 dark:text-red-400" />,
@@ -23,7 +23,7 @@ export default function HowItWorks() {
     {
       icon: <ShieldCheck className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />,
       title: "Transparency Data Mapping",
-      desc: "Retrieves municipal transparency records: local contractor name, budget allocated, amount spent, and last relaying date."
+      desc: "Maps the detected road type into 6 standardized categories (NH, SH, MDR, ODR, Local, or Rural Road) to retrieve contractor and budget transparency records."
     },
     {
       icon: <FileEdit className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />,

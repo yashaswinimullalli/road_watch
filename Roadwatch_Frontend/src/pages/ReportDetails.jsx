@@ -120,7 +120,7 @@ The reported road has been identified with ${roadDamage} through AI-based road a
 
 According to the infrastructure transparency records, the road was last relayed on ${lastRelayingDate} under the contractor ${contractor} with a sanctioned budget of ${budgetAllocated}. The current road condition is causing inconvenience and safety concerns for commuters and residents using the road regularly.
 
-The issue has been digitally verified using GPS-based location verification, Overpass API road classification, and AI-powered road damage analysis.
+The issue has been digitally verified using GPS-based location verification, Nominatim/Overpass road classification, and AI-powered road damage analysis.
 
 Road Details:
 Road Name        : ${roadName}

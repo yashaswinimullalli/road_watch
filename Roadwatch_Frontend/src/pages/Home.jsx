@@ -140,7 +140,7 @@ The reported road has been identified with ${roadDamage} through AI-based road a
 
 According to the infrastructure transparency records, the road was last relayed on ${lastRelayingDate} under the contractor ${contractor} with a sanctioned budget of ${budgetAllocated}. The current road condition is causing inconvenience and safety concerns for commuters and residents using the road regularly.
 
-The issue has been digitally verified using GPS-based location verification, Overpass API road classification, and AI-powered road damage analysis.
+The issue has been digitally verified using GPS-based location verification, Nominatim/Overpass road classification, and AI-powered road damage analysis.
 
 Road Details:
 Road Name        : ${roadName}
@@ -317,7 +317,7 @@ Road Transparency & Accountability System`;
       id: Date.now(),
       sender: 'bot',
       text: coords
-        ? '📡 Uploading image to AI · Fetching road data via Overpass API...'
+        ? '📡 Uploading image to AI · Fetching road data via Nominatim & Overpass API...'
         : '🔍 Analyzing your image and loading road transparency data...'
     }]);
 
@@ -577,15 +577,15 @@ Road Transparency & Accountability System`;
                           <span className="font-bold">1</span>
                         </div>
                         <h4 className="font-bold text-sm text-slate-800 dark:text-white mb-1">Snap & Geotag</h4>
-                        <p className="text-xs text-slate-500 dark:text-slate-400">Capture the road hazard. Your browser automatically fetches your location & reverse-geocodes it.</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400">Capture the road hazard. Your browser automatically fetches your location & reverse-geocodes it via Nominatim.</p>
                       </div>
 
                       <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex flex-col items-center text-center shadow-sm">
                         <div className="w-10 h-10 rounded-full bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mb-3">
                           <span className="font-bold">2</span>
                         </div>
-                        <h4 className="font-bold text-sm text-slate-800 dark:text-white mb-1">YOLOv8 AI & Overpass</h4>
-                        <p className="text-xs text-slate-500 dark:text-slate-400">Our real-time AI analyzes the damage type & severity, mapping it to ownership records from the Overpass API.</p>
+                        <h4 className="font-bold text-sm text-slate-800 dark:text-white mb-1">AI & Road Classification</h4>
+                        <p className="text-xs text-slate-500 dark:text-slate-400">Our real-time AI analyzes damage severity. The backend detects the road type using Nominatim with resilient Overpass API fallbacks.</p>
                       </div>
 
                       <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex flex-col items-center text-center shadow-sm">
@@ -593,7 +593,7 @@ Road Transparency & Accountability System`;
                           <span className="font-bold">3</span>
                         </div>
                         <h4 className="font-bold text-sm text-slate-800 dark:text-white mb-1">Transparent Action</h4>
-                        <p className="text-xs text-slate-500 dark:text-slate-400">Review municipal budgets & contractors, edit the auto-generated letter, and file it to higher authorities.</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400">Map the road to 6 database categories to fetch contractor/budget records, edit the complaint letter, and file it.</p>
                       </div>
                     </div>
                   )}

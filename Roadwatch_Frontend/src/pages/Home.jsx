@@ -285,11 +285,12 @@ Road Transparency & Accountability System`;
     // If validation fails → show toast and abort immediately.
     // If service is unreachable → fail-open (don't block the user).
     try {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
       const validationBlob = await fetch(imgData).then(r => r.blob());
       const validationForm = new FormData();
       validationForm.append('image', validationBlob, 'check.jpg');
 
-      const validationRes = await fetch('http://localhost:5000/api/validate-image', {
+      const validationRes = await fetch(`${apiUrl}/api/validate-image`, {
         method: 'POST',
         body:   validationForm,
       });
@@ -340,7 +341,8 @@ Road Transparency & Accountability System`;
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 35000); // 35s for AI model inference
 
-      const res = await fetch('http://localhost:5000/api/analyze-road', {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      const res = await fetch(`${apiUrl}/api/analyze-road`, {
         method: 'POST',
         body: formData,
         signal: controller.signal

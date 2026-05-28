@@ -181,7 +181,8 @@ function App() {
               // Store coords + address in state so Home can use them
               setUserCoords({ latitude, longitude, address: locationString });
 
-              await fetch('http://localhost:5000/api/location', {
+              const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+              await fetch(`${apiUrl}/api/location`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ location: locationString, latitude, longitude }),

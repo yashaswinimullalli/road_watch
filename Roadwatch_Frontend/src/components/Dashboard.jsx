@@ -41,7 +41,8 @@ export default function Dashboard() {
   const [loading, setLoading]   = useState(true);
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/reports')
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+    fetch(`${apiUrl}/api/reports`)
       .then(res => res.json())
       .then(result => {
         if (result.success && result.data) setReports(result.data);

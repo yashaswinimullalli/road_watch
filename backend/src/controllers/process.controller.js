@@ -4,7 +4,8 @@ const Location = require('../models/Location');
 const Road = require('../models/Road');
 const RoadDamage = require('../models/RoadDamage');
 
-const AI_SERVICE_URL = 'http://localhost:8000/api/v1/analyze';
+const AI_SERVICE_BASE = process.env.AI_SERVICE_URL ? process.env.AI_SERVICE_URL.replace(/\/api\/v1\/analyze\/?$/, '') : 'http://localhost:8000';
+const AI_SERVICE_URL = `${AI_SERVICE_BASE}/api/v1/analyze`;
 
 // Maps Overpass highway tag → human-readable road type
 const mapRoadType = (highwayTag) => {

@@ -1,7 +1,8 @@
 const axios = require('axios');
 const FormData = require('form-data');
 
-const AI_VALIDATE_URL = 'http://localhost:8000/api/v1/validate-road-image';
+const AI_SERVICE_BASE = process.env.AI_SERVICE_URL ? process.env.AI_SERVICE_URL.replace(/\/api\/v1\/analyze\/?$/, '') : 'http://localhost:8000';
+const AI_VALIDATE_URL = `${AI_SERVICE_BASE}/api/v1/validate-road-image`;
 
 /**
  * Validate whether the uploaded image is road/infrastructure related.

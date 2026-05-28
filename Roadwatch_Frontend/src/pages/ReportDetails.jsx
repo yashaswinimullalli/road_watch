@@ -10,7 +10,8 @@ export default function ReportDetails() {
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/reports')
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+    fetch(`${apiUrl}/api/reports`)
       .then(res => res.json())
       .then(result => {
         if (result.success && result.data && result.data.length > 0) {

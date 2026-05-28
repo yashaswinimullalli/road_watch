@@ -65,7 +65,7 @@ exports.processAnalysis = async (req, res) => {
           break; // Successfully got data, stop trying other mirrors
         }
       } catch (overpassErr) {
-        console.info(`ℹ️ Overpass API mirror busy/failed, trying next...`);
+        console.info(`ℹ️ Overpass API mirror busy/failed (${url}):`, overpassErr.message);
       }
     }
 
